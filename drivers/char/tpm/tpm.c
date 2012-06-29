@@ -30,6 +30,7 @@
 #include <linux/freezer.h>
 
 #include "tpm.h"
+#include "tpm_eventlog.h"
 
 enum tpm_const {
 	TPM_MINOR = 224,	/* officially assigned */
@@ -1254,7 +1255,7 @@ void tpm_remove_hardware(struct device *dev)
 
 	misc_deregister(&chip->vendor.miscdev);
 	sysfs_remove_group(&dev->kobj, chip->vendor.attr_group);
-	tpm_bios_log_teardown(chip->bios_dir);
+	tpm_event_log_teardown(chip->bios_dir);
 
 	/* write it this way to be explicit (chip->dev == dev) */
 	put_device(chip->dev);
@@ -1416,7 +1417,7 @@ struct tpm_chip *tpm_register_hardware(struct device *dev,
 		return NULL;
 	}
 
-	chip->bios_dir = tpm_bios_log_setup(devname);
+	chip->bios_dir = tpm_event_log_setup(devname);
 
 	/* Make chip available */
 	spin_lock(&driver_lock);
